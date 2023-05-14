@@ -1,0 +1,38 @@
+The ‘data.csv’ file has data pertaining to auto loans for the reporting month of Dec’22. Each row is a unique auto loan,
+and each column is an attribute of that loan. Detailed description of attributes is available in ‘data_dictionary.txt’ file.
+Using python and relevant packages, attempt the following questions:
+1) Using columns originationDate and loanTerm, calculate the maturityDate for each loan
+maturityDate = originationDate + loanTerm
+2) Calculate remaining term in months
+3) Which State (col: obligorState) has the second highest percentage of loans, by:
+a. Loan count
+b. Loan amount
+4) Calculate the share of used vehicle loans originated in each month, as a percentage of all loans originated in
+that month (use originationDate). Plot a graph to show the trend
+5) Identify the loans which defaulted in this month (create a boolean column named defaultFlag) and then
+calculate the percentage of defaulted loans
+Defaulted loans are those which have not made any payment in this month (Hint: Refer to columns
+beginningLoanBal and endingLoanBal)
+6) What percentage of used vehicle loans that have a co-obligor (co-borrower) pay an interest rate of <=3%?
+7) Which vehicle (Model name and year) is the most popular in Florida (obligorState = FL)?
+8) Bucket the column obligorCreditScore into 5 buckets. Calculate the average default rate for each bucket and
+plot a bar graph
+Bonus Question: Please attempt only after attempting all the above questions
+From the given data, estimate the vehicle value (col: vehicleValueAmount) using the Random Forest algorithm,
+and report the accuracy of your model. We are concerned with data processing/cleaning, feature engineering and
+selection, and how the problem is approached (especially the train/test methodology). Do not spend a lot of time
+on tuning hyperparameters. More Information on Random Forest Regression here:
+https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestRegressor.html
+Guidelines for submission:
+1. Please attempt all questions in a jupyter/ipython notebook, using comments/markup cells to show question
+numbers at relevant places
+2. If you have any questions, proceed by making necessary assumptions, explaining them clearly in the form of
+comments/markup within the notebook itself
+3. Place your code - ‘<YourName>_code.ipynb’ and a ‘.html’ export of the notebook - ‘<YourName>_code.html’
+in a folder named ‘<YourName>_loan_data’ and zip it.
+4. Your .zip file strictly should not strictly contain anything other than:
+a. Your Resume
+b. <YourName >_code.ipynb
+c. <YourName >_code.html
+5. Mail your .zip file to smarepa@frk.com and pratyushps@gmail.com
+All the best!
