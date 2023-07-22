@@ -1,30 +1,33 @@
-import os
-import nltk
-def load_files(directory):
-    """
-    Given a directory name, return a dictionary mapping the filename of each
-    `.txt` file inside that directory to the file's contents as a string.
-    """
-    path=os.getcwd()
-    path=os.path.join(path,directory)
-    dict_of_file={file_name : open(os.path.join(path,file_name),'r').read() for file_name in os.listdir(path)}    
-    return dict_of_file
+import torch
+import time
 
-def tokenize(document):
-    """
-    Given a document (represented as a string), return a list of all of the
-    words in that document, in order.
+# Set the matrix size
+matrix_size = 15555
 
-    Process document by coverting all words to lowercase, and removing any
-    punctuation or English stopwords.
-    """
-    document.lower()
-    word_list= nltk.tokenize.word_tokenize(document)
-    for word in word_list:
-        if word.isalpha():
-            word_list.remove(word)
-    return word_list
+# Generate random matrices
+a_cpu = torch.randn(matrix_size, matrix_size)
+b_cpu = torch.randn(matrix_size, matrix_size)
 
+# Move matrices to GPU if available
+for _ in range(1000000):
+    if torch.cuda.is_available():
+        device = torch.device("cuda")
+        a_gpu = a_cpu.to(device)
+        b_gpu = b_cpu.to(device)
 
-files = load_files("corpus")
-file_words = {filename: tokenize(files[filename]) for filename in files}
+        # Perform matrix multiplication on GPU and measure time
+        start_time_gpu = time.time()
+        result_gpu = torch.mm(a_gpu, b_gpu)
+        end_time_gpu = time.time()
+        time_taken_gpu = end_time_gpu - start_time_gpu
+        print(f"Matrix multiplication on GPU took {time_taken_gpu:.6f} seconds.")
+
+    else:
+        print("GPU not available. Skipping GPU matrix multiplication.")
+
+    # Perform matrix multiplication on CPU and measure time
+    start_time_cpu = time.time()
+    result_cpu = torch.mm(a_cpu, b_cpu)
+    end_time_cpu = time.time()
+    time_taken_cpu = end_time_cpu - start_time_cpu
+    print(f"Matrix multiplication on CPU took {time_taken_cpu:.6f} seconds.")

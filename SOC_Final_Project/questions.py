@@ -1,7 +1,8 @@
 import nltk
 import sys
 import os 
-nltk.download('punkt')
+# nltk.download('punkt')
+# nltk.download('stopwords') 
 FILE_MATCHES = 1
 SENTENCE_MATCHES = 1
 
@@ -62,13 +63,14 @@ def tokenize(document):
     punctuation or English stopwords.
     """
     document=document.lower()
+    
+    stopword = set(nltk.corpus.stopwords.words('english'))
     word_list= nltk.tokenize.word_tokenize(document)
-    for word in word_list:
-        if word.isalpha():
-            word_list.remove(word)
-    return word_list
+    wordlist=[word for word in word_list if word.isalpha() and word not in stopword]        
+            
+    return wordlist
 
-files = load_files("corpus")
+files = load_files("corpus")    
 file_words = {filename: tokenize(files[filename]) for filename in files}
 print(file_words)
 
