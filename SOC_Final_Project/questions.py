@@ -1,7 +1,7 @@
 import nltk
 import sys
 import os 
-
+nltk.download('punkt')
 FILE_MATCHES = 1
 SENTENCE_MATCHES = 1
 
@@ -49,8 +49,8 @@ def load_files(directory):
     `.txt` file inside that directory to the file's contents as a string.
     """
     path=os.getcwd()
-    path=os.path.join(path,'corpus')
-    dict_of_file={file_name : open(os.path.join(path,file_name),'r').read() for file_name in os.listdir(path)}    
+    path=os.path.join(path,directory)
+    dict_of_file={file_name : open(os.path.join(path,file_name),'r',encoding='utf-8').read() for file_name in os.listdir(path)}    
     return dict_of_file
 
 def tokenize(document):
@@ -61,14 +61,16 @@ def tokenize(document):
     Process document by coverting all words to lowercase, and removing any
     punctuation or English stopwords.
     """
-    document.lower()
+    document=document.lower()
     word_list= nltk.tokenize.word_tokenize(document)
     for word in word_list:
         if word.isalpha():
             word_list.remove(word)
     return word_list
-    
 
+files = load_files("corpus")
+file_words = {filename: tokenize(files[filename]) for filename in files}
+print(file_words)
 
 def compute_idfs(documents):
     """
