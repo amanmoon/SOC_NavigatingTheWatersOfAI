@@ -2,9 +2,10 @@ import nltk
 import sys
 import os 
 import math
-
-FILE_MATCHES = 7
-SENTENCE_MATCHES = 2
+# nltk.download('punkt')
+# nltk.download('stopwords') 
+FILE_MATCHES = 1
+SENTENCE_MATCHES = 1
 
 def main():
 
@@ -19,14 +20,13 @@ def main():
         for filename in files
     }
     file_idfs = compute_idfs(file_words)
-
     # Prompt user for query
     query = set(tokenize(input("Query: ")))
 
     # Determine top file matches according to TF-IDF
     filenames = top_files(query, file_words, file_idfs, n=FILE_MATCHES)
-
     # Extract sentences from top files
+    
     sentences = dict()
     for filename in filenames:
         for passage in files[filename].split("\n"):
@@ -34,10 +34,10 @@ def main():
                 tokens = tokenize(sentence)
                 if tokens:
                     sentences[sentence] = tokens
+                
 
     # Compute IDF values across sentences
     idfs = compute_idfs(sentences)
-
     # Determine top sentence matches
     matches = top_sentences(query, sentences, idfs, n=SENTENCE_MATCHES)
     for match in matches:
@@ -68,13 +68,9 @@ def tokenize(document):
     stopword = set(nltk.corpus.stopwords.words('english'))
     word_list= nltk.tokenize.word_tokenize(document)
     wordlist=[word for word in word_list if word.isalpha() and word not in stopword]        
-         
-  
+    
     return wordlist
 
-
-# files = load_files("corpus")    
-# file_words = {filename: tokenize(files[filename]) for filename in files}  #dict filename:tokenised list
 def compute_idfs(documents):
     """
     Given a dictionary of `documents` that maps names of documents to a list
@@ -96,32 +92,23 @@ def compute_idfs(documents):
             if word in documents[textfile]:
                 word_doc_freq+=1
         word_idf[word]=math.log(len(documents.keys())/word_doc_freq)
+        
     return word_idf
-                    
-# idf=compute_idfs(file_words)
-# idf=sorted(idf.items(), key=lambda item: item[1])
-
 
 def top_files(query, files, idfs, n):
-    """
-    Given a `query` (a set of words), `files` (a dictionary mapping names of
-    files to a list of their words), and `idfs` (a dictionary mapping words
-    to their IDF values), return a list of the filenames of the the `n` top
-    files that match the query, ranked according to tf-idf.
-    """
-    tfidf = {}
+    file_tfidf = {}
     for txtfile in files:
-        for word in query:
-            if word in files[txtfile]:
-                if word in tfidf:
-                    tfidf[txtfile] += idfs[word]
-                else:
-                    tfidf[txtfile] = idfs[word]
+        file_tfidfs = 0
+        for words in files[txtfile]:
+            if words in query:
+                file_tfidfs += idfs[words]
+        file_tfidf[txtfile] = file_tfidfs
+        
+    sorted_dict =[k for k ,v in sorted(file_tfidf.items(), key=lambda item: item[1], reverse=True)]
 
-    sorted_files = sorted(tfidf.items(), key=lambda item: item[1], reverse=True)
-    top_n_files = [filename for filename, score in sorted_files][:n]
-
-    return top_n_files
+    
+    return sorted_dict[:n]
+   
 
 def top_sentences(query, sentences, idfs, n):
     """
@@ -131,16 +118,17 @@ def top_sentences(query, sentences, idfs, n):
     the query, ranked according to idf. If there are ties, preference should
     be given to sentences that have a higher query term density.
     """
-    def sentence_score(sentence):
-        total_idf = sum(idfs[word] for word in sentence if word in query)
-        query_term_density = sum(1 for word in sentence if word in query) / len(sentence)
-        return total_idf, query_term_density
-
-    sorted_sentences = sorted(sentences.items(), key=lambda item: sentence_score(item[1]), reverse=True)
-    top_n_sentences = [sentence for sentence, _ in sorted_sentences][:n]
-
-    return top_n_sentences
-
+    sentences_idf={}
+    for sentence in sentences:
+        sentence_total_idf=0
+        for word in sentences[sentence]:
+            if word in query:
+                sentence_total_idf+=idfs[word]
+        sentences_idf[sentence]=sentence_total_idf
+            
+    sorted_dict =[k for k,v in sorted(sentences_idf.items(), key=lambda item: item[1], reverse=True)]
+    
+    return sorted_dict[:n]
 
 
 if __name__ == "__main__":
