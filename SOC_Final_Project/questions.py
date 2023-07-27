@@ -2,10 +2,9 @@ import nltk
 import sys
 import os 
 import math
-# nltk.download('punkt')
-# nltk.download('stopwords') 
-FILE_MATCHES = 1
-SENTENCE_MATCHES = 1
+
+FILE_MATCHES = 7
+SENTENCE_MATCHES = 2
 
 def main():
 
@@ -74,8 +73,8 @@ def tokenize(document):
     return wordlist
 
 
-files = load_files("corpus")    
-file_words = {filename: tokenize(files[filename]) for filename in files}  #dict filename:tokenised list
+# files = load_files("corpus")    
+# file_words = {filename: tokenize(files[filename]) for filename in files}  #dict filename:tokenised list
 def compute_idfs(documents):
     """
     Given a dictionary of `documents` that maps names of documents to a list
@@ -96,11 +95,11 @@ def compute_idfs(documents):
         for textfile in documents:
             if word in documents[textfile]:
                 word_doc_freq+=1
-        word_idf[word]=word_idf[word]*math.log(len(documents.keys())/word_doc_freq)
+        word_idf[word]=math.log(len(documents.keys())/word_doc_freq)
     return word_idf
                     
-idf=compute_idfs(file_words)
-idf=sorted(idf.items(), key=lambda item: item[1])
+# idf=compute_idfs(file_words)
+# idf=sorted(idf.items(), key=lambda item: item[1])
 
 
 def top_files(query, files, idfs, n):
@@ -110,15 +109,19 @@ def top_files(query, files, idfs, n):
     to their IDF values), return a list of the filenames of the the `n` top
     files that match the query, ranked according to tf-idf.
     """
-    file_list={}
-    for file in files:
-        total_tfidf=0
+    tfidf = {}
+    for txtfile in files:
         for word in query:
-            if word in files[file]:
-              total_tfidf+=files[file]
-    sorted(file_list.items(),key=lambda item:item[1])
+            if word in files[txtfile]:
+                if word in tfidf:
+                    tfidf[txtfile] += idfs[word]
+                else:
+                    tfidf[txtfile] = idfs[word]
 
-    return file_list[:n]
+    sorted_files = sorted(tfidf.items(), key=lambda item: item[1], reverse=True)
+    top_n_files = [filename for filename, score in sorted_files][:n]
+
+    return top_n_files
 
 def top_sentences(query, sentences, idfs, n):
     """
@@ -128,7 +131,16 @@ def top_sentences(query, sentences, idfs, n):
     the query, ranked according to idf. If there are ties, preference should
     be given to sentences that have a higher query term density.
     """
-        
+    def sentence_score(sentence):
+        total_idf = sum(idfs[word] for word in sentence if word in query)
+        query_term_density = sum(1 for word in sentence if word in query) / len(sentence)
+        return total_idf, query_term_density
+
+    sorted_sentences = sorted(sentences.items(), key=lambda item: sentence_score(item[1]), reverse=True)
+    top_n_sentences = [sentence for sentence, _ in sorted_sentences][:n]
+
+    return top_n_sentences
+
 
 
 if __name__ == "__main__":
