@@ -3,7 +3,7 @@ import sys
 import os 
 import math
 # nltk.download('punkt')
-# nltk.download('stopwords') 
+# nltk.download('stopwords')
 FILE_MATCHES = 1
 SENTENCE_MATCHES = 1
 
