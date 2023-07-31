@@ -80,13 +80,12 @@ def compute_idfs(documents):
     resulting dictionary.
     """
     word_idf={}
+    word_list=[]
     for txtfile in documents:        
         for words in documents[txtfile]:
-            if words in word_idf:
-                word_idf[words]+=1
-            else:
-                word_idf[words]=1
-    for word in word_idf:
+            if words not in word_idf:
+                word_list.append(words)
+    for word in word_list:
         word_doc_freq=0
         for textfile in documents:
             if word in documents[textfile]:
